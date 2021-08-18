@@ -8,7 +8,7 @@
     <title>Тестовый проект</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 10px">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">Navbar</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,7 +33,35 @@
       </div>
     </nav>
 
-    <h1>Главная страница</h1>
+    <form class="row g-3" method="get">
+      <div class="col-auto">
+        <input type="text" class="form-control" placeholder="Название книги" name="name" value="{{ request.GET.name }}">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary mb-3">Поиск</button>
+      </div>
+    </form>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Название</th>
+          <th scope="col">Количество страниц</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for book in object_list %}
+            <tr>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td>
+                  <a href="{% url 'core:book_detail' book.id %}">{{ book.name }}</a>
+              </td>
+              <td>{{ book.pages|default:'-' }}</td>
+            </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
 
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
