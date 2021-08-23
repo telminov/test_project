@@ -18,6 +18,3 @@ class Book(models.Model):
     def __str__(self):
         return self.name
 
-
-class BookProperties(models.Model):
-    book = models.OneToOneField(Book, related_name='prop', on_delete=models.CASCADE)

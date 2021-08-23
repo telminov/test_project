@@ -1,6 +1,9 @@
-from django.views.generic import TemplateView, ListView, DetailView
+from django.urls import reverse
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 
 import core.models
+import core.forms
+import core.filters
 
 
 class TitleMixin:
@@ -23,17 +26,51 @@ class IndexView(TitleMixin, TemplateView):
 class BookList(TitleMixin, ListView):
     title = 'Книги'
 
+    def get_filters(self) -> core.filters.Book:
+        return core.filters.Book(self.request.GET)
+
+    def get_context_data(self, **kwargs):
+        c = super().get_context_data()
+        c['filters'] = self.get_filters()
+        return c
+
     def get_queryset(self):
-        queryset = core.models.Book.objects.all()
-        name = self.request.GET.get('name')
-        if name:
-            queryset = queryset.filter(name__istartswith=name)
-        return queryset
+        return self.get_filters().qs
 
 
-class BookDetail(TitleMixin, DetailView):
+# class BookDetail(TitleMixin, DetailView):
+#     queryset = core.models.Book.objects.all()
+#
+#     def get_title(self):
+#         return str(self.get_object())
+
+
+class BookCreate(TitleMixin, CreateView):
+    title = 'Добавление книги'
+    queryset = core.models.Book.objects.all()
+    form_class = core.forms.BookEdit
+    template_name = 'core/book_form.html'
+
+    def get_success_url(self):
+        return reverse('core:books')
+
+
+class BookUpdate(TitleMixin, UpdateView):
+    queryset = core.models.Book.objects.all()
+    form_class = core.forms.BookEdit
+
+    def get_title(self):
+        return 'Обновление ' + str(self.get_object())
+
+    def get_success_url(self):
+        return reverse('core:books')
+
+
+class BookDelete(TitleMixin, DeleteView):
     queryset = core.models.Book.objects.all()
 
     def get_title(self):
-        return str(self.get_object())
+        return 'Удаление ' + str(self.get_object())
 
+    def get_success_url(self):
+        return reverse('core:books')
