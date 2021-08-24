@@ -4,13 +4,17 @@ from django.urls import reverse
 from core import models
 
 
-class BookModelTestCase(TestCase):
+class BookModel(TestCase):
 
     def setUp(self):
         self.book = models.Book.objects.create(name='Test Book')
 
     def testStr(self):
-        self.assertEqual(str(self.book), 'Test Book')
+        self.assertEqual(
+            str(self.book),
+            self.book.name,
+            'Строковое представление объекта Book долно быть равно значению атрибута name'
+        )
 
 
 class BookSearchTestCase(TestCase):
@@ -21,6 +25,7 @@ class BookSearchTestCase(TestCase):
 
     def testWithoutParams(self):
         response = self.client.get(reverse('core:books'))
+        self.assertEqual(200, response.status_code)
         self.assertSequenceEqual(
             list(response.context['object_list']),
             list(models.Book.objects.all()),
